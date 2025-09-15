@@ -3,35 +3,36 @@
 #include <cstdint>
 #include <iostream>
 #include <vector>
+# include <timer.h>
 
 using std::size_t;
 
-constexpr size_t elem_rc(size_t row, size_t col, size_t cols)
+constexpr size_t elem_rc(const size_t row, const size_t col, const size_t cols)
 {
 	return row * cols + col;
 }
 
-constexpr size_t try_wrap(std::int64_t index, std::int64_t dim)
+constexpr size_t try_wrap(const std::int64_t index, const std::int64_t dim)
 {
 	return ((index % dim) + dim) % dim;
 }
 
 
 size_t alive_neighbors(
-	size_t row,
-	size_t col,
-	size_t rows,
-	size_t cols,
-	const std::vector<bool> & board)
+	const size_t row,
+	const size_t col,
+	const size_t rows,
+	const size_t cols,
+	const std::vector<bool> &board)
 {
-	struct Adjust
-	{
+	struct Adjust {
 		std::int64_t r;
 		std::int64_t c;
 	};
 	constexpr std::array<Adjust, 8> adjusts{
-		Adjust{0, -1}, Adjust{-1, -1}, Adjust{-1, 0}, Adjust{-1, 1},
-		Adjust{0, 1}, Adjust{1, 1}, Adjust{1, 0}, Adjust{1, -1}
+		Adjust{ 0, -1 }, Adjust{ -1, -1 }, Adjust{ -1, 0 },
+		Adjust{ -1, 1 },
+		Adjust{ 0, 1 }, Adjust{ 1, 1 }, Adjust{ 1, 0 }, Adjust{ 1, -1 }
 	};
 	const auto living = std::count_if(
 		std::begin(adjusts),
@@ -56,11 +57,11 @@ size_t alive_neighbors(
 }
 
 bool rule_1(
-	size_t row,
-	size_t col,
-	size_t rows,
-	size_t cols,
-	const std::vector<bool> & board
+	const size_t row,
+	const size_t col,
+	const size_t rows,
+	const size_t cols,
+	const std::vector<bool> &board
 	)
 {
 	return board[elem_rc(row, col, cols)] && alive_neighbors(
@@ -68,60 +69,66 @@ bool rule_1(
 }
 
 bool rule_2(
-	size_t row,
-	size_t col,
-	size_t rows,
-	size_t cols,
-	const std::vector<bool> & board)
+	const size_t row,
+	const size_t col,
+	const size_t rows,
+	const size_t cols,
+	const std::vector<bool> &board)
 {
-	auto neighbors{alive_neighbors(row, col, rows, cols, board)};
-	return board[elem_rc(row, col, cols)] && (neighbors == 2 || neighbors == 3);
+	const auto neighbors{ alive_neighbors(row, col, rows, cols, board) };
+	return board[elem_rc(row, col, cols)] && (
+		       neighbors == 2 || neighbors == 3);
 }
 
 bool rule_3(
-	size_t row,
-	size_t col,
-	size_t rows,
-	size_t cols,
-	const std::vector<bool> & board)
+	const size_t row,
+	const size_t col,
+	const size_t rows,
+	const size_t cols,
+	const std::vector<bool> &board)
 {
 	return board[elem_rc(row, col, cols)] && alive_neighbors(
 		       row, col, rows, cols, board) > 3;
 }
 
 bool rule_4(
-	size_t row,
-	size_t col,
-	size_t rows,
-	size_t cols,
-	const std::vector<bool> & board)
+	const size_t row,
+	const size_t col,
+	const size_t rows,
+	const size_t cols,
+	const std::vector<bool> &board)
 {
 	return !board[elem_rc(row, col, cols)] && alive_neighbors(
 		       row, col, rows, cols, board) == 3;
 }
 
-void update_board(size_t rows, size_t cols, std::vector<bool> & board)
+void update_board(const size_t rows, const size_t cols,
+                  std::vector<bool> &board)
 {
-	auto original_board{board};
-	for (size_t row{0}; row < rows; ++row) {
-		for (size_t col{0}; col < cols; ++col) {
+	const auto original_board{ board };
+	for (size_t row{ 0 }; row < rows; ++row) {
+		for (size_t col{ 0 }; col < cols; ++col) {
 			if (rule_1(row, col, rows, cols, original_board) ||
 			    rule_3(row, col, rows, cols, original_board)) {
 				board[elem_rc(row, col, cols)] = false;
-			} else if (rule_2(row, col, rows, cols, original_board) ||
-			           rule_4(row, col, rows, cols, original_board)) {
+			} else if (
+				rule_2(row, col, rows, cols, original_board) ||
+				rule_4(row, col, rows, cols, original_board)) {
 				board[elem_rc(row, col, cols)] = true;
 			}
 		}
 	}
 }
 
-void print_board(size_t rows, size_t cols, const std::vector<bool> & board)
+void print_board(const size_t rows, const size_t cols,
+                 const std::vector<bool> &board)
 {
-	constexpr std::array<char, 2> alive_dead_display{'*', '@'};
-	for (size_t row{0}; row < rows; ++row) {
-		for (size_t col{0}; col < cols; ++col) {
-			std::cout << alive_dead_display[board[elem_rc(row, col, cols)]];
+	for (size_t row{ 0 }; row < rows; ++row) {
+		constexpr std::array<char, 2> alive_dead_display{ '*', '@' };
+
+		for (size_t col{ 0 }; col < cols; ++col) {
+			std::cout << alive_dead_display[board[elem_rc(
+				row, col, cols)]];
 		}
 		std::cout << '\n';
 	}
@@ -129,22 +136,78 @@ void print_board(size_t rows, size_t cols, const std::vector<bool> & board)
 
 [[noreturn]] int main()
 {
-	constexpr size_t cols{40};
-	constexpr size_t rows{20};
+	timer_lib_initialize();
+	constexpr size_t cols{ 40 };
+	constexpr size_t rows{ 27 };
 
 	std::vector<bool> board(rows * cols, false);
 
 	// glider
-	board[elem_rc(10, 7, cols)] = true;
-	board[elem_rc(11, 8, cols)] = true;
-	board[elem_rc(11, 9, cols)] = true;
-	board[elem_rc(10, 9, cols)] = true;
-	board[elem_rc(9, 9, cols)] = true;
+	board[elem_rc(5, 2, cols)] = true;
+	board[elem_rc(6, 2, cols)] = true;
+	board[elem_rc(5, 3, cols)] = true;
+	board[elem_rc(6, 3, cols)] = true;
+
+	board[elem_rc(5, 12, cols)] = true;
+	board[elem_rc(6, 12, cols)] = true;
+	board[elem_rc(7, 12, cols)] = true;
+	board[elem_rc(4, 13, cols)] = true;
+	board[elem_rc(8, 13, cols)] = true;
+	board[elem_rc(3, 14, cols)] = true;
+	board[elem_rc(9, 14, cols)] = true;
+	board[elem_rc(3, 15, cols)] = true;
+	board[elem_rc(9, 15, cols)] = true;
+	board[elem_rc(6, 16, cols)] = true;
+	board[elem_rc(4, 17, cols)] = true;
+	board[elem_rc(8, 17, cols)] = true;
+	board[elem_rc(5, 18, cols)] = true;
+	board[elem_rc(6, 18, cols)] = true;
+	board[elem_rc(7, 18, cols)] = true;
+	board[elem_rc(6, 19, cols)] = true;
+
+	board[elem_rc(3, 22, cols)] = true;
+	board[elem_rc(4, 22, cols)] = true;
+	board[elem_rc(5, 22, cols)] = true;
+	board[elem_rc(3, 23, cols)] = true;
+	board[elem_rc(4, 23, cols)] = true;
+	board[elem_rc(5, 23, cols)] = true;
+	board[elem_rc(2, 24, cols)] = true;
+	board[elem_rc(6, 24, cols)] = true;
+	board[elem_rc(1, 26, cols)] = true;
+	board[elem_rc(2, 26, cols)] = true;
+	board[elem_rc(6, 26, cols)] = true;
+	board[elem_rc(7, 26, cols)] = true;
+
+	board[elem_rc(3, 36, cols)] = true;
+	board[elem_rc(4, 36, cols)] = true;
+	board[elem_rc(3, 37, cols)] = true;
+	board[elem_rc(4, 37, cols)] = true;
+
+	// eater
+	board[elem_rc(20, 27, cols)] = true;
+	board[elem_rc(21, 27, cols)] = true;
+	board[elem_rc(20, 28, cols)] = true;
+	board[elem_rc(21, 28, cols)] = true;
+
+	board[elem_rc(21, 32, cols)] = true;
+	board[elem_rc(22, 31, cols)] = true;
+	board[elem_rc(22, 33, cols)] = true;
+	board[elem_rc(23, 32, cols)] = true;
+
+	board[elem_rc(23, 34, cols)] = true;
+	board[elem_rc(24, 34, cols)] = true;
+	board[elem_rc(25, 34, cols)] = true;
+	board[elem_rc(25, 35, cols)] = true;
 
 	for (;;) {
-		std::cout << "\33[H\33[2J\33[3J";
+		constexpr double delay = 0.1; // wait for 1/10th of a second
+		const tick_t time = timer_current();
+		printf("\33[H\33[2J\33[3J");
 		print_board(rows, cols, board);
 		update_board(rows, cols, board);
-		std::cin.get();
+		while (timer_elapsed(time) < delay) {
+			// busy wait (ideally cross-platform sleep for some of this...)
+		}
 	}
+	timer_lib_shutdown();
 }

@@ -1,11 +1,15 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0" is_locked="false">
     <option name="myName" value="Project Default" />
-    <inspection_tool class="CppTooWideScope" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CLangTidyLocal" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="CppInconsistentNaming" enabled="true" level="HINT" enabled_by_default="true" />
+    <inspection_tool class="CppTemplateArgumentsCanBeDeduced" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppUnnecessaryWhitespace" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="CustomRegExpInspection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="CythonUsageBeforeDeclarationInspection" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="DuplicatedCode" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="ES6TopLevelAwaitExpression" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="IncorrectFormatting" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="Misra" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="PyAugmentAssignmentInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PyCallingNonCallableInspection" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="PyCompatibilityInspection" enabled="true" level="WARNING" enabled_by_default="true">

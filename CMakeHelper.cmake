@@ -1,0 +1,13 @@
+function(list_cmake_variables)
+    message(STATUS "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    message(STATUS "   🔧 Dumping CMake Variables (DEBUG MODE)     ")
+    message(STATUS "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    get_cmake_property(variable_names VARIABLES)
+    foreach(variable_name ${variable_names})
+        if (NOT "${${variable_name}}" STREQUAL "")
+            message(STATUS "${variable_name}=${${variable_name}}")
+        endif()
+    endforeach()
+    message(STATUS "~~~~~~~~ Dumping CMake Variables (Done) ~~~~~~~~")
+
+endfunction()
